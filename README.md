@@ -7,6 +7,7 @@
     - [0.1 Start EDC](#01-start-edc)
     - [0.2 Start Wallet](#02-start-wallet)
     - [0.3 Testing](#03-testing)
+    - [0.4 Limitations](#04-limitations)
   - [1. Introduction](#1-introduction)
   - [2. Purpose of this Demo](#2-purpose-of-this-demo)
   - [3. The Scenario](#3-the-scenario)
@@ -76,7 +77,10 @@ This fork of the MinimumViableDataspace is adjusted to use the OID wallet as con
 - wallet adjustments
   - got a new module called edc
   - offers new endpoints
-    - `.well-known/did.json` - returns the did web for the wallet (localhost:7083), controller key will be the identifier multikey
+    - `/.well-known/did.json` - returns the did web for the wallet (localhost:7083), controller key will be the identifier multikey
+    - `/edc/register-identity` - endpoint to register the identity that should be used for the edc connector
+    - `/edc/sts` - offers the secure token service and will return a JWT token (including the requested bearer access scope) signed by the registered wallet identifier
+    - `/edc/presentations/query` - will validate auth header and return the presentation including the membership credential
 
 The project can be executed as described in the usual documentation, but please keep in mind to use the local environment, it was not tested with kubernetes.
 
@@ -115,6 +119,11 @@ POSTGRES_PORT=5433
 ### 0.3 Testing
 
 The setup of the MVD project is finished. Ensure to have the MVD postman collection imported. With that, you can execute the `Request Catalog` to test.
+
+### 0.4 Limitations
+
+- `edc/presentations/query` will only work with `membership:read` scope
+- membership credential is hardcoded within the OID wallet
 
 ## 1. Introduction
 
