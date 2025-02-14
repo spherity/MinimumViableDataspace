@@ -23,7 +23,7 @@ dependencies {
         // this will remove the RemoteDataPlaneSelectorService
         exclude(group = "org.eclipse.edc", "data-plane-selector-client")
         // exclude the Remote STS client
-        exclude(group = "org.eclipse.edc", "identity-trust-sts-remote-client")
+        // exclude(group = "org.eclipse.edc", "identity-trust-sts-remote-client")
     }
     runtimeOnly(project(":launchers:dataplane")) {
         // this will remove the RemoteDataPlaneSelectorService

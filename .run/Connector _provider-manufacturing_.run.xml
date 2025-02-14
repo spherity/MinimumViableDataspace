@@ -6,7 +6,7 @@
       <option value="$PROJECT_DIR$/deployment/assets/env/provider_connector_manufacturing.env" />
     </option>
     <option name="MAIN_CLASS_NAME" value="org.eclipse.edc.boot.system.runtime.BaseRuntime" />
-    <module name="mvd.launchers.runtime-embedded.main" />
+    <module name="mvd.launchers.runtime-embedded-provider.main" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -6,7 +6,7 @@
       <option value="$PROJECT_DIR$/deployment/assets/env/consumer_connector.env" />
     </option>
     <option name="MAIN_CLASS_NAME" value="org.eclipse.edc.boot.system.runtime.BaseRuntime" />
-    <module name="mvd.launchers.runtime-embedded.main" />
+    <module name="mvd.launchers.runtime-embedded-consumer.main" />
     <option name="PROGRAM_PARAMETERS" value="--log-level=debug" />
     <method v="2">
       <option name="Make" enabled="true" />

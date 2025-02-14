@@ -27,6 +27,7 @@ public class SecretsExtension implements ServiceExtension {
     // duplicated from DcpDefaultServicesExtension
     private static final String STS_PRIVATE_KEY_ALIAS = "edc.iam.sts.privatekey.alias";
     private static final String STS_PUBLIC_KEY_ID = "edc.iam.sts.publickey.id";
+
     @Inject
     private Vault vault;
 
@@ -67,6 +68,7 @@ public class SecretsExtension implements ServiceExtension {
 
             vault.storeSecret(context.getConfig().getString(STS_PRIVATE_KEY_ALIAS), privateKey);
             vault.storeSecret(context.getConfig().getString(STS_PUBLIC_KEY_ID), publicKey);
+            vault.storeSecret("sts-client-secret-oid", "totally-secret");
 
             context.getMonitor().withPrefix("DEMO").warning(">>>>>> This extension hard-codes a keypair into the vault! <<<<<<");
         }
