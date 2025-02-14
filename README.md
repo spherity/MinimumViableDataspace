@@ -99,7 +99,7 @@ The project can be executed as described in the usual documentation, but please 
   - `git checkout feature/OITA-305-edc-identity-provider`
   - `pnpm i`
   - `cd ./apps/wallet`
-- create a `.env` file in `./apps/wallet` (ensure to use port 7083)
+- create a `.env` file in `./apps/wallet` (ensure to use port 7083)]
 
 ```config
 AUTH0_AUDIENCE=https://wallet-api.oid.spherity.dev
@@ -113,8 +113,32 @@ POSTGRES_PORT=5433
 - execute `pnpm start` within the wallet folder
 - use the postman collection from the oid-katana project to login into auth0
 - create a workspace
-- register the workspace identifer as edc participant:
+- register the workspace identifier as edc participant:
   - send `POST` to `http://localhost:7083/edc/register-identity?workspaceId={{wallet_workspace_id}}`
+
+Optionally, you can also start the frontend to show the actual member credential (credential will be available in the workspace, after `register-identity` was called):
+
+- `git clone https://github.com/spherity/oid-kodachi`
+- `cd oid-kodachi`
+- `pnpm i`
+- `cd apps/odachi`
+- add the following env (ensure to have the api base url set to port 7083)
+
+```config
+VITE_API_BASE_URL=http://localhost:7083
+VITE_API_ISSUER_BASE_URL=http://localhost:3001
+VITE_API_VERIFIER_BASE_URL=http://localhost:3003
+VITE_AUTH0_AUDIENCE=https://wallet-api.oid.spherity.dev
+VITE_AUTH0_CLIENT_ID=29MdKDV57Q9OuaNrjKd1egfpGJmJT9p4
+VITE_AUTH0_DOMAIN=spherity-oid.eu.auth0.com
+VITE_BASE_URL=http://localhost:3000
+VITE_META_COMMIT_SHA=
+VITE_ISSUER_WORKSPACE_ID=01943c11-81c9-7aa8-8afe-3825c15c798e
+VITE_VERIFIER_WORKSPACE_ID=01943c10-d14b-7ff4-8af2-6f59db980d25
+VITE_META_VERSION=0193d4fd-81f5-7771-b2e6-038c3dd26b3e
+```
+
+- execute `pnpm start` and visit [http://localhost:3000](http://localhost:3000)
 
 ### 0.3 Testing
 
