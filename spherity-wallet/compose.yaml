@@ -1,0 +1,33 @@
+services:
+  wallet-postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - wallet_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  wallet:
+    image: ghcr.io/spherity/oid-wallet:latest
+    depends_on:
+      wallet-postgres:
+        condition: service_healthy
+    ports:
+      - "7083:3001"
+    environment:
+      HTTP_HOST: 0.0.0.0
+      HTTP_PUBLIC_URL: http://wallet:3001
+      AUTH0_DOMAIN: spherity-oid.eu.auth0.com
+      AUTH0_AUDIENCE: https://wallet-api.oid.spherity.dev
+      POSTGRES_HOST: wallet-postgres
+      POSTGRES_PORT: 5432
+      SECRET_BOX_SECRET_KEY: 92c76b05e788b6b9b89c49465b27fc3c153b0c94eb88c80798676db3fb110c5f
+
+volumes:
+  wallet_postgres_data:

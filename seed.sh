@@ -48,7 +48,7 @@ DATA_CONSUMER=$(jq -n --arg pem "$PEM_CONSUMER" '{
            "serviceEndpoints":[
              {
                 "type": "CredentialService",
-                "serviceEndpoint": "http://localhost:7081/api/credentials/v1/participants/ZGlkOndlYjpsb2NhbGhvc3QlM0E3MDgz",
+                "serviceEndpoint": "http://localhost:7083/api/credentials/v1/participants/ZGlkOndlYjpsb2NhbGhvc3QlM0E3MDgz",
                 "id": "consumer-credentialservice-1"
              },
              {
@@ -69,10 +69,12 @@ DATA_CONSUMER=$(jq -n --arg pem "$PEM_CONSUMER" '{
 
 # the consumer runtime will need to have the client_secret in its vault as well, so we store it in a variable
 # and use the Secrets API (part of Management API) to insert it.
-clientSecret=$(curl -s --location 'http://localhost:7082/api/identity/v1alpha/participants/' \
---header 'Content-Type: application/json' \
---header "x-api-key: $API_KEY" \
---data "$DATA_CONSUMER" | jq -r '.clientSecret')
+# clientSecret=$(curl -s --location 'http://localhost:7082/api/identity/v1alpha/participants/' \
+# --header 'Content-Type: application/json' \
+# --header "x-api-key: $API_KEY" \
+# --data "$DATA_CONSUMER" | jq -r '.clientSecret')
+
+clientSecret="totally-secret"
 
 # add client secret to the consumer runtime
 SECRETS_DATA=$(jq -n --arg secret "$clientSecret" \

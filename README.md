@@ -2,60 +2,199 @@
 
 <!-- TOC -->
 
-* [Minimum Viable Dataspace Demo](#minimum-viable-dataspace-demo)
-    * [1. Introduction](#1-introduction)
-    * [2. Purpose of this Demo](#2-purpose-of-this-demo)
-    * [3. The Scenario](#3-the-scenario)
-        * [3.1 Participants](#31-participants)
-        * [3.2 Data setup](#32-data-setup)
-        * [3.3 Access control](#33-access-control)
-        * [3.4 DIDs, participant lists and VerifiableCredentials](#34-dids-participant-lists-and-verifiablecredentials)
-    * [4. Running the demo (inside IntelliJ)](#4-running-the-demo-inside-intellij)
-        * [4.1 Start NGINX](#41-start-nginx)
-        * [4.2 Starting the runtimes](#42-starting-the-runtimes)
-        * [4.3 Seeding the dataspace](#43-seeding-the-dataspace)
-        * [4.4 Next steps](#44-next-steps)
-    * [5. Running the Demo (Kubernetes)](#5-running-the-demo-kubernetes)
-        * [5.1 Build the runtime images](#51-build-the-runtime-images)
-        * [5.2 Create the K8S cluster](#52-create-the-k8s-cluster)
-        * [5.3 Seed the dataspace](#53-seed-the-dataspace)
-        * [5.4 JVM crashes with `SIGILL` on ARM platforms](#54-jvm-crashes-with-sigill-on-arm-platforms)
-        * [5.5 Debugging MVD in Kubernetes](#55-debugging-mvd-in-kubernetes)
-    * [6. Differences between Kubernetes and IntelliJ](#6-differences-between-kubernetes-and-intellij)
-        * [6.1 In-memory databases](#61-in-memory-databases)
-        * [6.2 Memory-based secret vaults](#62-memory-based-secret-vaults)
-        * [6.3 Embedded vs Remote STS](#63-embedded-vs-remote-sts)
-    * [7. Executing REST requests using Postman](#7-executing-rest-requests-using-postman)
-        * [7.1 Get the catalog](#71-get-the-catalog)
-        * [7.2 Initiate the contract negotiation](#72-initiate-the-contract-negotiation)
-        * [7.3 Query negotiation status](#73-query-negotiation-status)
-        * [7.4 Initiate data transfer](#74-initiate-data-transfer)
-        * [7.5 Query data transfers](#75-query-data-transfers)
-        * [7.6 Get EndpointDataReference](#76-get-endpointdatareference)
-        * [7.7 Get access token for EDR](#77-get-access-token-for-edr)
-        * [7.8 Fetch data](#78-fetch-data)
-    * [8. Custom extensions in MVD](#8-custom-extensions-in-mvd)
-        * [8.1 Catalog Node Resolver](#81-catalog-node-resolver)
-        * [8.2 Default scope mapping function](#82-default-scope-mapping-function)
-        * [8.3 Scope extractor for `DataProcessor` credentials](#83-scope-extractor-for-dataprocessor-credentials)
-        * [8.4 Policy evaluation functions](#84-policy-evaluation-functions)
-            * [8.4.1 Membership evaluation function](#841-membership-evaluation-function)
-            * [8.4.2 DataAccessLevel evaluation function](#842-dataaccesslevel-evaluation-function)
-        * [8.5 Super-user seeding](#85-super-user-seeding)
-    * [9. Advanced topics](#9-advanced-topics)
-        * [9.1 Regenerating issuer keys](#91-regenerating-issuer-keys)
-        * [9.2 Regenerating participant keys](#92-regenerating-participant-keys)
-            * [9.2.1 IntelliJ deployment:](#921-intellij-deployment)
-            * [9.2.2 Kubernetes deployment](#922-kubernetes-deployment)
-    * [10. Other caveats, shortcuts and workarounds](#10-other-caveats-shortcuts-and-workarounds)
-        * [10.1 In-memory stores in local deployment](#101-in-memory-stores-in-local-deployment)
-        * [10.2 DID resolution](#102-did-resolution)
-            * [10.2.1 `did:web` for participants](#1021-didweb-for-participants)
-            * [10.2.2 `did:web` for the dataspace issuer](#1022-didweb-for-the-dataspace-issuer)
-        * [10.3 Credential Issuance](#103-credential-issuance)
-        * [10.4 Default scope-to-criterion transformer](#104-default-scope-to-criterion-transformer)
+- [Minimum Viable Dataspace Demo](#minimum-viable-dataspace-demo)
+  - [0. OID - EDC Eudi wallet](#0-oid---edc-eudi-wallet)
+    - [0.1 Starting docker spherity wallet](#01-starting-docker-spherity-wallet)
+      - [0.1.1 Starting spherity wallet](#011-starting-spherity-wallet)
+      - [0.1.2 Setting up wallet](#012-setting-up-wallet)
+      - [0.1.2 Starting EDC](#012-starting-edc)
+      - [0.1.3 Testing Request Catalog](#013-testing-request-catalog)
+    - [0.2 Local development](#02-local-development)
+      - [0.2.1 Start EDC](#021-start-edc)
+      - [0.2.2 Start Wallet](#022-start-wallet)
+      - [0.2.3 Testing](#023-testing)
+      - [0.2.4 Limitations](#024-limitations)
+  - [1. Introduction](#1-introduction)
+  - [2. Purpose of this Demo](#2-purpose-of-this-demo)
+  - [3. The Scenario](#3-the-scenario)
+    - [3.1 Participants](#31-participants)
+    - [3.2 Data setup](#32-data-setup)
+    - [3.3 Access control](#33-access-control)
+    - [3.4 DIDs, participant lists and VerifiableCredentials](#34-dids-participant-lists-and-verifiablecredentials)
+  - [4. Running the demo (inside IntelliJ)](#4-running-the-demo-inside-intellij)
+    - [4.1 Start NGINX](#41-start-nginx)
+    - [4.2 Starting the runtimes](#42-starting-the-runtimes)
+    - [4.3 Seeding the dataspace](#43-seeding-the-dataspace)
+    - [4.4 Next steps](#44-next-steps)
+  - [5. Running the Demo (Kubernetes)](#5-running-the-demo-kubernetes)
+    - [5.1 Build the runtime images](#51-build-the-runtime-images)
+    - [5.2 Create the K8S cluster](#52-create-the-k8s-cluster)
+    - [5.3 Seed the dataspace](#53-seed-the-dataspace)
+    - [5.4 JVM crashes with `SIGILL` on ARM platforms](#54-jvm-crashes-with-sigill-on-arm-platforms)
+    - [5.5 Debugging MVD in Kubernetes](#55-debugging-mvd-in-kubernetes)
+  - [6. Differences between Kubernetes and IntelliJ](#6-differences-between-kubernetes-and-intellij)
+    - [6.1 In-memory databases](#61-in-memory-databases)
+    - [6.2 Memory-based secret vaults](#62-memory-based-secret-vaults)
+    - [6.3 Embedded vs Remote STS](#63-embedded-vs-remote-sts)
+  - [7. Executing REST requests using Postman](#7-executing-rest-requests-using-postman)
+    - [7.1 Get the catalog](#71-get-the-catalog)
+    - [7.2 Initiate the contract negotiation](#72-initiate-the-contract-negotiation)
+    - [7.3 Query negotiation status](#73-query-negotiation-status)
+    - [7.4 Initiate data transfer](#74-initiate-data-transfer)
+    - [7.5 Query data transfers](#75-query-data-transfers)
+    - [7.6 Get EndpointDataReference](#76-get-endpointdatareference)
+    - [7.7 Get access token for EDR](#77-get-access-token-for-edr)
+    - [7.8 Fetch data](#78-fetch-data)
+  - [8. Custom extensions in MVD](#8-custom-extensions-in-mvd)
+    - [8.1 Catalog Node Resolver](#81-catalog-node-resolver)
+    - [8.2 Default scope mapping function](#82-default-scope-mapping-function)
+    - [8.3 Scope extractor for `DataProcessor` credentials](#83-scope-extractor-for-dataprocessor-credentials)
+    - [8.4 Policy evaluation functions](#84-policy-evaluation-functions)
+      - [8.4.1 Membership evaluation function](#841-membership-evaluation-function)
+      - [8.4.2 DataAccessLevel evaluation function](#842-dataaccesslevel-evaluation-function)
+    - [8.5 Super-user seeding](#85-super-user-seeding)
+  - [9. Advanced topics](#9-advanced-topics)
+    - [9.1 Regenerating issuer keys](#91-regenerating-issuer-keys)
+    - [9.2 Regenerating participant keys](#92-regenerating-participant-keys)
+      - [9.2.1 IntelliJ deployment:](#921-intellij-deployment)
+      - [9.2.2 Kubernetes deployment](#922-kubernetes-deployment)
+  - [10. Other caveats, shortcuts and workarounds](#10-other-caveats-shortcuts-and-workarounds)
+    - [10.1 In-memory stores in local deployment](#101-in-memory-stores-in-local-deployment)
+    - [10.2 DID resolution](#102-did-resolution)
+      - [10.2.1 `did:web` for participants](#1021-didweb-for-participants)
+      - [10.2.2 `did:web` for the dataspace issuer](#1022-didweb-for-the-dataspace-issuer)
+    - [10.3 Credential Issuance](#103-credential-issuance)
+    - [10.4 Default scope-to-criterion transformer](#104-default-scope-to-criterion-transformer)
 
 <!-- TOC -->
+
+## 0. OID - EDC Eudi wallet
+
+This fork of the MinimumViableDataspace is adjusted to use the OID wallet as consumer identity hub.
+
+- MVD adjustments
+  - use temurin 22 in all run configs
+  - add external STS config to consumer_connector
+  - add split runtime embedded configuration into consumer and provider
+    - consumer config enables external STS
+    - provider config enables local, in memory STS
+  - disabled participant seeding for consumer (will be done in OID wallet)
+  - Consumer identiyhub is disabled in the dataspace run config
+- wallet adjustments
+  - got a new module called edc
+  - offers new endpoints
+    - `/.well-known/did.json` - returns the did web for the wallet (localhost:7083), controller key will be the identifier multikey
+    - `/edc/register-identity` - endpoint to register the identity that should be used for the edc connector
+    - `/edc/sts` - offers the secure token service and will return a JWT token (including the requested bearer access scope) signed by the registered wallet identifier
+    - `/edc/presentations/query` - will validate auth header and return the presentation including the membership credential
+
+The project can be executed as described in the usual documentation, but please keep in mind to use the local environment, it was not tested with kubernetes.
+
+### 0.1 Starting docker spherity wallet
+
+#### 0.1.1 Starting spherity wallet
+
+The spherity wallet replaces the identity hub of the consumer. To start and configure it, just navigate to the ./spherity-wallet folder. In this folder, call `docker compose up` to start the wallet and the required postgres database.
+
+The wallet be started on port 7083, like the normal consumer identity hub would do.
+
+#### 0.1.2 Setting up wallet
+
+The wallet has a multi tenancy concept included and in order to have a identity working on the wallet service, a workspace needs to be created. To do so, import the two files from the `spherity-wallet` folder into postman:
+
+- MVD Spherity Local Development.postman_environment.json
+- MVD Spherity.postman_collection.json
+
+Its a reduced form of the original MVD postman collection that contains a specific folder called `OID wallet`. In order to do request against this wallet, first authorize your self with auth0.
+
+- Click on `OID wallet` folder
+- Go to `Authorization`
+- scroll to the bottom and click on `Get new Access Token`
+
+This will lead you to `https://spherity-oid.eu.auth0.com` where you can setup a new user. When registered, postman will receive the callback and will display a `Manage access tokens` dialog. Click on `Use Token` and you will be authenticated.
+
+Afterwards execute the `Create workspace` request and use the returned id to register this as participant (basically using the new workspace identity as web did provider in this server).
+
+When everything is working, you should able to request the following URL: `http://localhost:7083`.
+
+#### 0.1.2 Starting EDC
+
+Just open the project with intellij and start the dataspace runtime or execute it on command line. You just need to ensure to disable the `Consumer Identity Hub` when starting.
+
+Afterwards execute the `./seed.sh` script and you will be ready to go.
+
+#### 0.1.3 Testing Request Catalog
+
+Now you should be able to send the `Request Catalog` request from the `ControlPlane Management` folder and get a sucessfull result.
+
+Please keep in mind: The docker image includes a hardcoded membership credential and does not support any other EDC credential currently.
+
+### 0.2 Local development
+
+#### 0.2.1 Start EDC
+
+- open intellij
+- select "dataspace" run config in to the top right corner
+- press start
+- open command line and execute `./seed.sh` (to register the provider)
+
+#### 0.2.2 Start Wallet
+
+- open command line
+  - `git clone https://github.com/spherity/oid-katana`
+  - `cd oid-katana`
+  - `git checkout feature/OITA-305-edc-identity-provider`
+  - `pnpm i`
+  - `cd ./apps/wallet`
+- create a `.env` file in `./apps/wallet` (ensure to use port 7083)]
+
+```config
+AUTH0_AUDIENCE=https://wallet-api.oid.spherity.dev
+AUTH0_DOMAIN=spherity-oid.eu.auth0.com
+DATABASE_URL=postgres://postgres:postgres@localhost:5433/postgres
+HTTP_PORT=7083
+HTTP_PUBLIC_URL=http://localhost:7083
+POSTGRES_PORT=5433
+```
+
+- execute `pnpm start` within the wallet folder
+- use the postman collection from the oid-katana project to login into auth0
+- create a workspace
+- register the workspace identifier as edc participant:
+  - send `POST` to `http://localhost:7083/edc/register-identity?workspaceId={{wallet_workspace_id}}`
+
+Optionally, you can also start the frontend to show the actual member credential (credential will be available in the workspace, after `register-identity` was called):
+
+- `git clone https://github.com/spherity/oid-kodachi`
+- `cd oid-kodachi`
+- `pnpm i`
+- `cd apps/odachi`
+- add the following env (ensure to have the api base url set to port 7083)
+
+```config
+VITE_API_BASE_URL=http://localhost:7083
+VITE_API_ISSUER_BASE_URL=http://localhost:3001
+VITE_API_VERIFIER_BASE_URL=http://localhost:3003
+VITE_AUTH0_AUDIENCE=https://wallet-api.oid.spherity.dev
+VITE_AUTH0_CLIENT_ID=29MdKDV57Q9OuaNrjKd1egfpGJmJT9p4
+VITE_AUTH0_DOMAIN=spherity-oid.eu.auth0.com
+VITE_BASE_URL=http://localhost:3000
+VITE_META_COMMIT_SHA=
+VITE_ISSUER_WORKSPACE_ID=01943c11-81c9-7aa8-8afe-3825c15c798e
+VITE_VERIFIER_WORKSPACE_ID=01943c10-d14b-7ff4-8af2-6f59db980d25
+VITE_META_VERSION=0193d4fd-81f5-7771-b2e6-038c3dd26b3e
+```
+
+- execute `pnpm start` and visit [http://localhost:3000](http://localhost:3000)
+
+#### 0.2.3 Testing
+
+The setup of the MVD project is finished. Ensure to have the MVD postman collection imported. With that, you can execute the `Request Catalog` to test.
+
+#### 0.2.4 Limitations
+
+- `edc/presentations/query` will only work with `membership:read` scope
+- membership credential is hardcoded within the OID wallet
 
 ## 1. Introduction
 

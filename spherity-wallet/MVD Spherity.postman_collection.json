@@ -1,0 +1,379 @@
+{
+	"info": {
+		"_postman_id": "80fc3eb9-2b1b-46fe-ab0d-b1d407ddb420",
+		"name": "MVD Spherity",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34015219"
+	},
+	"item": [
+		{
+			"name": "ControlPlane Management",
+			"item": [
+				{
+					"name": "Request Catalog",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is >=200 and <300\", function () {",
+									"    pm.expect(pm.response.code < 300 && pm.response.code >= 200).to.be.true",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"@context\": [\n        \"https://w3id.org/edc/connector/management/v0.0.1\"\n    ],\n    \"@type\": \"CatalogRequest\",\n    \"counterPartyAddress\": \"{{CATALOG_SERVER_DSP_URL}}/api/dsp\",\n    \"counterPartyId\": \"{{PROVIDER_ID}}\",\n    \"protocol\": \"dataspace-protocol-http\",\n    \"querySpec\": {\n        \"offset\": 0,\n        \"limit\": 50\n    }\n}"
+						},
+						"url": {
+							"raw": "{{HOST}}/api/management/v3/catalog/request",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"api",
+								"management",
+								"v3",
+								"catalog",
+								"request"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "OID Wallet",
+			"item": [
+				{
+					"name": "Create workspace",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const { data: response } = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"wallet_workspace_id\", response.id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Wallet Workspace\",\n    \"adminInfo\": {\n        \"name\": \"super admin\",\n        \"email\": \"super@admin.de\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{wallet_host}}/workspaces",
+							"host": [
+								"{{wallet_host}}"
+							],
+							"path": [
+								"workspaces"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get workspaces",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const { data: response } = pm.response.json();",
+									"",
+									"pm.collectionVariables.set(\"wallet_workspace_id\", response.pop().id);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{wallet_host}}/workspaces",
+							"host": [
+								"{{wallet_host}}"
+							],
+							"path": [
+								"workspaces"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register Participant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:7083/edc/register-identity?workspaceId={{wallet_workspace_id}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "7083",
+							"path": [
+								"edc",
+								"register-identity"
+							],
+							"query": [
+								{
+									"key": "workspaceId",
+									"value": "{{wallet_workspace_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "oauth2",
+				"oauth2": [
+					{
+						"key": "refreshRequestParams",
+						"value": [],
+						"type": "any"
+					},
+					{
+						"key": "tokenRequestParams",
+						"value": [],
+						"type": "any"
+					},
+					{
+						"key": "authRequestParams",
+						"value": [
+							{
+								"key": "audience",
+								"value": "{{wallet_auth0_audience}}",
+								"enabled": true,
+								"send_as": "request_url"
+							}
+						],
+						"type": "any"
+					},
+					{
+						"key": "tokenName",
+						"value": "wallet_jwt",
+						"type": "string"
+					},
+					{
+						"key": "challengeAlgorithm",
+						"value": "S256",
+						"type": "string"
+					},
+					{
+						"key": "useBrowser",
+						"value": true,
+						"type": "boolean"
+					},
+					{
+						"key": "grant_type",
+						"value": "implicit",
+						"type": "string"
+					},
+					{
+						"key": "clientId",
+						"value": "{{wallet_auth0_client_id}}",
+						"type": "string"
+					},
+					{
+						"key": "authUrl",
+						"value": "{{wallet_auth0_host}}/oauth/authorize",
+						"type": "string"
+					},
+					{
+						"key": "addTokenTo",
+						"value": "header",
+						"type": "string"
+					},
+					{
+						"key": "client_authentication",
+						"value": "header",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "password",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "X-Api-Key",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"if(pm.request.method == \"POST\" || pm.request.method == \"PUT\"){",
+					"    pm.request.headers.add(\"Content-Type: application/json\");",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "HOST",
+			"value": "http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "PROVIDER_DSP",
+			"value": "http://localhost:8092",
+			"type": "string"
+		},
+		{
+			"key": "PROVIDER_ID",
+			"value": "did:web:localhost%3A7093",
+			"type": "string"
+		},
+		{
+			"key": "CS_URL",
+			"value": "http://localhost:8181",
+			"type": "string"
+		},
+		{
+			"key": "ISSUER_ADMIN_URL",
+			"value": "http://localhost:10013",
+			"type": "string"
+		},
+		{
+			"key": "IH_API_TOKEN",
+			"value": "c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo=",
+			"type": "string"
+		},
+		{
+			"key": "ISSUER_ADMIN_API_TOKEN",
+			"value": "c3VwZXItdXNlcg==.c3VwZXItc2VjcmV0LWtleQo=",
+			"type": "string"
+		},
+		{
+			"key": "PARTICIPANT_ID",
+			"value": "super-user"
+		},
+		{
+			"key": "DID",
+			"value": "did:web:super-user"
+		},
+		{
+			"key": "NEW_PARTICIPANT_ID",
+			"value": "did:web:localhost%3A7083",
+			"type": "string"
+		},
+		{
+			"key": "CATALOG_URL",
+			"value": "http://localhost:8084",
+			"type": "string"
+		},
+		{
+			"key": "TED_DSP_URL",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ISSUER_CONTEXT_ID",
+			"value": "ZGlkOndlYjpsb2NhbGhvc3QlM0ExMDEwMA==",
+			"type": "string"
+		},
+		{
+			"key": "ISSUER_DID",
+			"value": "did:web:localhost%3A10100",
+			"type": "string"
+		},
+		{
+			"key": "PARTICIPANT_ID_BASE64",
+			"value": "ZGlkOndlYjpsb2NhbGhvc3QlM0E3MDgz",
+			"type": "string"
+		},
+		{
+			"key": "wallet_workspace_id",
+			"value": ""
+		}
+	]
+}
