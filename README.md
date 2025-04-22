@@ -94,6 +94,8 @@ The project can be executed as described in the usual documentation, but please 
 
 #### 0.1.1 Starting spherity wallet
 
+*Before starting: Ensure to "Enable host networking" in docker (when using docker deskopt: Settings -> Resources -> Network), otherwise the wallet cannot access the locally started mvd ports.*
+
 The spherity wallet replaces the identity hub of the consumer. To start and configure it, just navigate to the ./spherity-wallet folder. In this folder, call `docker compose up` to start the wallet and the required postgres database.
 
 The wallet be started on port 7083, like the normal consumer identity hub would do.

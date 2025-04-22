@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - wallet_postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,14 +18,18 @@ services:
     depends_on:
       wallet-postgres:
         condition: service_healthy
+    build:
+      network: host
+    network_mode: host
     ports:
-      - "7083:3001"
+      - "7083:7083"
     environment:
       HTTP_HOST: 0.0.0.0
-      HTTP_PUBLIC_URL: http://wallet:3001
+      HTTP_PORT: 7083
+      HTTP_PUBLIC_URL: http://wallet:7083
       AUTH0_DOMAIN: spherity-oid.eu.auth0.com
       AUTH0_AUDIENCE: https://wallet-api.oid.spherity.dev
-      POSTGRES_HOST: wallet-postgres
+      POSTGRES_HOST: 127.0.0.1
       POSTGRES_PORT: 5432
       SECRET_BOX_SECRET_KEY: 92c76b05e788b6b9b89c49465b27fc3c153b0c94eb88c80798676db3fb110c5f
 
